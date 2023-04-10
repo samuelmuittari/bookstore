@@ -1,6 +1,5 @@
 package sm.bookstore.web;
 
-import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -8,23 +7,25 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.servlet.ModelAndView;
+
 
 import sm.bookstore.domain.Book;
 import sm.bookstore.domain.BookRepository;
+import sm.bookstore.domain.CategoryRepository;
 
 @Controller
 public class BookController {
     
     @Autowired
     private BookRepository bookRepository;
+    @Autowired
+    private CategoryRepository categoryRepository;
 
     @RequestMapping(value="/booklist", method = RequestMethod.GET)
-    public ModelAndView bookList(){
-        List<Book> books = (List<Book>) bookRepository.findAll();
-        ModelAndView modelAndView = new ModelAndView("booklist");
-            modelAndView.addObject("books", books);
-            return modelAndView;
+    public String bookList(Model model){
+        model.addAttribute("books", bookRepository.findAll());
+        model.addAttribute("category", categoryRepository.findAll());
+        return "booklist";
     }
     @RequestMapping(value = "/delete/{bookId}", method = RequestMethod.GET)
     public String deleteBook(@PathVariable("bookId") Long bookId) {
@@ -35,7 +36,7 @@ public class BookController {
     public String addBook(Model model){
 
             model.addAttribute("book", new Book());
-    
+            model.addAttribute("category", categoryRepository.findAll());
             return "addbook";
     }
     @RequestMapping(value = "/save", method = RequestMethod.POST)
@@ -43,6 +44,13 @@ public class BookController {
 
         bookRepository.save(book);
 
-        return "redirect:booklist";
+        return "redirect:/booklist";
+    }
+
+    @RequestMapping(value = "/edit/{bookId}")
+    public String editBook(@PathVariable("bookId") Long bookId, Model model){
+        model.addAttribute("book", bookRepository.findById(bookId));
+        model.addAttribute("category", categoryRepository.findAll());
+        return "editbook";
     }
 }
