@@ -1,13 +1,16 @@
 package sm.bookstore.web;
 
 
+import java.util.List;
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import sm.bookstore.domain.Book;
 import sm.bookstore.domain.BookRepository;
@@ -27,11 +30,25 @@ public class BookController {
         model.addAttribute("category", categoryRepository.findAll());
         return "booklist";
     }
+
+    // Restful service to get all books
+    @RequestMapping(value="/books", method = RequestMethod.GET)
+    public @ResponseBody List<Book> bookListRest() {	
+        return (List<Book>) bookRepository.findAll();
+    }
+    
+    // Restful service to get book by id
+    @RequestMapping(value="/book/{id}", method = RequestMethod.GET)
+    public @ResponseBody Optional<Book> findBookRest(@PathVariable("id") Long bookId){
+        return bookRepository.findById(bookId);
+    }
+
     @RequestMapping(value = "/delete/{bookId}", method = RequestMethod.GET)
     public String deleteBook(@PathVariable("bookId") Long bookId) {
         bookRepository.deleteById(bookId);
         return "redirect:/booklist";
     }
+
     @RequestMapping(value ="/add")
     public String addBook(Model model){
 
@@ -39,6 +56,7 @@ public class BookController {
             model.addAttribute("category", categoryRepository.findAll());
             return "addbook";
     }
+    
     @RequestMapping(value = "/save", method = RequestMethod.POST)
     public String saveBook(Book book) {
 
@@ -53,4 +71,5 @@ public class BookController {
         model.addAttribute("category", categoryRepository.findAll());
         return "editbook";
     }
+
 }

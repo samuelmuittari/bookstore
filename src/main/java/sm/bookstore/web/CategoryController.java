@@ -14,7 +14,7 @@ import sm.bookstore.domain.CategoryRepository;
 public class CategoryController {
     
     @Autowired
-    CategoryRepository categoryRepository;
+    private CategoryRepository categoryRepository;
 
     @RequestMapping("/categorylist")
     public String categoryList(Model model) {
